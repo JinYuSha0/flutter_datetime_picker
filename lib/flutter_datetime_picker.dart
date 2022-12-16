@@ -226,17 +226,9 @@ class DatePickerState extends State<DatePickerComponent> {
                     })
                   : null,
             ),
-          ],
+          ].reversed.toList(),
         ),
       ),
     );
-  }
-
-  String _localeDone() {
-    return i18nObjInLocale(widget.locale)['done'] as String;
-  }
-
-  String _localeCancel() {
-    return i18nObjInLocale(widget.locale)['cancel'] as String;
   }
 }
