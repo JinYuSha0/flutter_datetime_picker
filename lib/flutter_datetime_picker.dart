@@ -24,11 +24,13 @@ class DatePickerWidget extends DatePickerComponent {
     required pickerModel,
     onChanged,
     locale,
+    reverse,
   }) : super(
             key: key,
             pickerModel: pickerModel,
             onChanged: onChanged,
-            locale: locale);
+            locale: locale,
+            reverse: reverse);
 }
 
 class DatePickerComponent extends StatefulWidget {
@@ -37,7 +39,8 @@ class DatePickerComponent extends StatefulWidget {
       required this.pickerModel,
       this.onChanged,
       this.locale,
-      this.theme})
+      this.theme,
+      this.reverse = false})
       : super(key: key) {
     this.theme = theme ?? DatePickerTheme();
   }
@@ -49,6 +52,8 @@ class DatePickerComponent extends StatefulWidget {
   final BasePickerModel pickerModel;
 
   DatePickerTheme? theme;
+
+  final bool? reverse;
 
   @override
   State<StatefulWidget> createState() {
@@ -159,76 +164,86 @@ class DatePickerState extends State<DatePickerComponent> {
   }
 
   Widget _renderItemView(DatePickerTheme theme) {
+    final coulums = [
+      Container(
+        child: widget.pickerModel.layoutProportions()[0] > 0
+            ? _renderColumnView(
+                ValueKey(widget.pickerModel.currentLeftIndex()),
+                theme,
+                widget.pickerModel.leftStringAtIndex,
+                leftScrollCtrl,
+                widget.pickerModel.layoutProportions()[0], (index) {
+                widget.pickerModel.setLeftIndex(index);
+              }, (index) {
+                setState(() {
+                  refreshScrollOffset();
+                  _notifyDateChanged();
+                });
+              })
+            : null,
+      ),
+      Text(
+        widget.pickerModel.leftDivider(),
+        style: theme.itemStyle,
+      ),
+      Container(
+        child: widget.pickerModel.layoutProportions()[1] > 0
+            ? _renderColumnView(
+                ValueKey(widget.pickerModel.currentLeftIndex()),
+                theme,
+                widget.pickerModel.middleStringAtIndex,
+                middleScrollCtrl,
+                widget.pickerModel.layoutProportions()[1], (index) {
+                widget.pickerModel.setMiddleIndex(index);
+              }, (index) {
+                setState(() {
+                  refreshScrollOffset();
+                  _notifyDateChanged();
+                });
+              })
+            : null,
+      ),
+      Text(
+        widget.pickerModel.rightDivider(),
+        style: theme.itemStyle,
+      ),
+      Container(
+        child: widget.pickerModel.layoutProportions()[2] > 0
+            ? _renderColumnView(
+                ValueKey(widget.pickerModel.currentMiddleIndex() * 100 +
+                    widget.pickerModel.currentLeftIndex()),
+                theme,
+                widget.pickerModel.rightStringAtIndex,
+                rightScrollCtrl,
+                widget.pickerModel.layoutProportions()[2], (index) {
+                widget.pickerModel.setRightIndex(index);
+              }, (index) {
+                setState(() {
+                  refreshScrollOffset();
+                  _notifyDateChanged();
+                });
+              })
+            : null,
+      ),
+    ].reversed.toList();
     return Container(
       color: theme.backgroundColor,
       child: Directionality(
         textDirection: TextDirection.ltr,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: widget.pickerModel.layoutProportions()[0] > 0
-                  ? _renderColumnView(
-                      ValueKey(widget.pickerModel.currentLeftIndex()),
-                      theme,
-                      widget.pickerModel.leftStringAtIndex,
-                      leftScrollCtrl,
-                      widget.pickerModel.layoutProportions()[0], (index) {
-                      widget.pickerModel.setLeftIndex(index);
-                    }, (index) {
-                      setState(() {
-                        refreshScrollOffset();
-                        _notifyDateChanged();
-                      });
-                    })
-                  : null,
-            ),
-            Text(
-              widget.pickerModel.leftDivider(),
-              style: theme.itemStyle,
-            ),
-            Container(
-              child: widget.pickerModel.layoutProportions()[1] > 0
-                  ? _renderColumnView(
-                      ValueKey(widget.pickerModel.currentLeftIndex()),
-                      theme,
-                      widget.pickerModel.middleStringAtIndex,
-                      middleScrollCtrl,
-                      widget.pickerModel.layoutProportions()[1], (index) {
-                      widget.pickerModel.setMiddleIndex(index);
-                    }, (index) {
-                      setState(() {
-                        refreshScrollOffset();
-                        _notifyDateChanged();
-                      });
-                    })
-                  : null,
-            ),
-            Text(
-              widget.pickerModel.rightDivider(),
-              style: theme.itemStyle,
-            ),
-            Container(
-              child: widget.pickerModel.layoutProportions()[2] > 0
-                  ? _renderColumnView(
-                      ValueKey(widget.pickerModel.currentMiddleIndex() * 100 +
-                          widget.pickerModel.currentLeftIndex()),
-                      theme,
-                      widget.pickerModel.rightStringAtIndex,
-                      rightScrollCtrl,
-                      widget.pickerModel.layoutProportions()[2], (index) {
-                      widget.pickerModel.setRightIndex(index);
-                    }, (index) {
-                      setState(() {
-                        refreshScrollOffset();
-                        _notifyDateChanged();
-                      });
-                    })
-                  : null,
-            ),
-          ].reversed.toList(),
+          children:
+              widget.reverse == true ? coulums.reversed.toList() : coulums,
         ),
       ),
     );
+  }
+
+  String _localeDone() {
+    return i18nObjInLocale(widget.locale)['done'] as String;
+  }
+
+  String _localeCancel() {
+    return i18nObjInLocale(widget.locale)['cancel'] as String;
   }
 }
