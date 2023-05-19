@@ -42,7 +42,7 @@ class DatePickerComponent extends StatefulWidget {
       this.theme,
       this.reverse = false})
       : super(key: key) {
-    this.theme = theme ?? DatePickerTheme();
+    this.theme = theme ?? MyDatePickerTheme();
   }
 
   final DateChangedCallback? onChanged;
@@ -51,7 +51,7 @@ class DatePickerComponent extends StatefulWidget {
 
   final BasePickerModel pickerModel;
 
-  DatePickerTheme? theme;
+  MyDatePickerTheme? theme;
 
   final bool? reverse;
 
@@ -84,7 +84,7 @@ class DatePickerState extends State<DatePickerComponent> {
 
   @override
   Widget build(BuildContext context) {
-    DatePickerTheme theme = widget.theme!;
+    MyDatePickerTheme theme = widget.theme!;
     return GestureDetector(
         child: ClipRect(
             child: GestureDetector(
@@ -101,14 +101,14 @@ class DatePickerState extends State<DatePickerComponent> {
     }
   }
 
-  Widget _renderPickerView(DatePickerTheme theme) {
+  Widget _renderPickerView(MyDatePickerTheme theme) {
     Widget itemView = _renderItemView(theme);
     return itemView;
   }
 
   Widget _renderColumnView(
     ValueKey key,
-    DatePickerTheme theme,
+    MyDatePickerTheme theme,
     StringAtIndexCallBack stringAtIndexCB,
     ScrollController scrollController,
     int layoutProportion,
@@ -163,7 +163,7 @@ class DatePickerState extends State<DatePickerComponent> {
     );
   }
 
-  Widget _renderItemView(DatePickerTheme theme) {
+  Widget _renderItemView(MyDatePickerTheme theme) {
     final coulums = [
       Container(
         child: widget.pickerModel.layoutProportions()[0] > 0
